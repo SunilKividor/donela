@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/SunilKividor/donela/internal/di"
 	"github.com/joho/godotenv"
@@ -18,6 +17,8 @@ func main() {
 		panic(err)
 	}
 
-	port := os.Getenv("PORT")
-	server.Serve(port)
+	err = server.Serve(server.Port)
+	if err != nil {
+		panic(err)
+	}
 }
