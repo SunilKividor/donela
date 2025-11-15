@@ -1,19 +1,23 @@
 package main
 
 import (
-	"github.com/SunilKividor/donela/internal/api"
-	"github.com/gin-gonic/gin"
+	"fmt"
+	"os"
+
+	"github.com/SunilKividor/donela/internal/di"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	engine := gin.New()
-	engine.Use(gin.Logger())
-	server := api.NewServer(engine, "3000")
+	if err := godotenv.Load("../../.env"); err == nil {
+		fmt.Println("[INFO] Loaded .env from project root")
+	}
 
-	api.RegisterRoutes(engine)
-
-	if err := server.Serve(); err != nil {
+	server, err := di.Initialize()
+	if err != nil {
 		panic(err)
 	}
 
+	port := os.Getenv("PORT")
+	server.Serve(port)
 }
