@@ -3,9 +3,9 @@ package handler
 import (
 	"context"
 	"net/http"
-	"os"
 	"time"
 
+	"github.com/SunilKividor/donela/internal/config"
 	"github.com/SunilKividor/donela/internal/storage"
 	"github.com/SunilKividor/donela/internal/util"
 	"github.com/gin-gonic/gin"
@@ -13,26 +13,43 @@ import (
 )
 
 type StorageHandler struct {
-	storage storage.StorageService
+	Config  *config.Config
+	Storage storage.StorageService
 }
 
-func NewStorageHandler(store storage.StorageService) *StorageHandler {
+func NewStorageHandler(cfg *config.Config, store storage.StorageService) *StorageHandler {
 	return &StorageHandler{
-		storage: store,
+		Config:  cfg,
+		Storage: store,
 	}
 }
 
 func (sh *StorageHandler) UploadURL(c *gin.Context) {
 	ctx := context.Background()
 
-	bucket := os.Getenv("S3Bucket")
+	bucket := sh.Config.AwsS3Config.Bucket
 	prefix := "raw"
 	userId := uuid.New().String() //get this from the gin context - user id
 	contentExt := ".flac"
 
 	key := util.GenerateNewAWSObjectKey(prefix, userId, contentExt)
 
-	url, err := sh.storage.UploadURL(ctx, bucket, key, 5*time.Minute)
+	url, err := sh.Storage.UploadURL(ctx, bucket, key, 5*time.Minute)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"url": url})
+}
+
+func (sh *StorageHandler) DownloadURL(c *gin.Context) {
+	ctx := context.Background()
+
+	bucket := sh.Config.AwsS3Config.Bucket
+	key := "" //get from the request context
+
+	url, err := sh.Storage.DownloadURL(ctx, bucket, key, 5*time.Minute)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

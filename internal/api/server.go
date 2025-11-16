@@ -4,26 +4,29 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/SunilKividor/donela/internal/config"
 	"github.com/SunilKividor/donela/internal/storage"
 	"github.com/gin-gonic/gin"
 )
 
 type Server struct {
+	Port    string
 	engine  *gin.Engine
 	storage storage.StorageService
 }
 
-func NewServer(storage storage.StorageService) *Server {
+func NewServer(cfg *config.Config, storage storage.StorageService) *Server {
 
 	engine := gin.New()
 	engine.Use(gin.Logger())
 
 	s := &Server{
+		Port:    cfg.ServerConfig.Port,
 		engine:  engine,
 		storage: storage,
 	}
 
-	RegisterRoutes(engine, storage)
+	RegisterRoutes(engine, cfg, storage)
 
 	return s
 }

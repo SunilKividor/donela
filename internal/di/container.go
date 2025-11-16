@@ -11,14 +11,16 @@ import (
 func Initialize() (*api.Server, error) {
 	ctx := context.Background()
 
-	s3Client, err := config.NewS3Client(ctx)
+	cfg := config.Load()
+
+	s3Client, err := config.NewS3Client(ctx, cfg.AwsS3Config)
 	if err != nil {
 		return nil, err
 	}
 
 	storage := storage.NewS3StorageClient(s3Client)
 
-	server := api.NewServer(storage)
+	server := api.NewServer(cfg, storage)
 
 	return server, nil
 }
