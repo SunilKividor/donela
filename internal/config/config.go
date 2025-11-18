@@ -5,17 +5,26 @@ import "os"
 type Config struct {
 	ServerConfig *ServerConfig
 	AwsS3Config  *AWSS3Config
+	AwsSQSConfig *AWSSQSConfig
+	AwsIAMConfig *AWSIAMConfig
 }
 
 type ServerConfig struct {
 	Port string
 }
 
-type AWSS3Config struct {
-	Bucket       string
+type AWSIAMConfig struct {
 	AccessKey    string
 	AccessSecret string
 	Region       string
+}
+
+type AWSS3Config struct {
+	Bucket string
+}
+
+type AWSSQSConfig struct {
+	QueueURL string
 }
 
 func Load() *Config {
@@ -24,7 +33,12 @@ func Load() *Config {
 			Port: os.Getenv("PORT"),
 		},
 		AwsS3Config: &AWSS3Config{
-			Bucket:       os.Getenv("S3Bucket"),
+			Bucket: os.Getenv("S3Bucket"),
+		},
+		AwsSQSConfig: &AWSSQSConfig{
+			QueueURL: os.Getenv("SQSQueueURL"),
+		},
+		AwsIAMConfig: &AWSIAMConfig{
 			AccessKey:    os.Getenv("S3AccessKey"),
 			AccessSecret: os.Getenv("S3AccessSecret"),
 			Region:       os.Getenv("S3Region"),

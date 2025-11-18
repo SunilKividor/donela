@@ -12,7 +12,7 @@ func main() {
 		fmt.Println("[INFO] Loaded .env from project root")
 	}
 
-	server, err := di.Initialize()
+	server, err := di.InitializeApp()
 	if err != nil {
 		panic(err)
 	}

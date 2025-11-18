@@ -8,12 +8,12 @@ import (
 	"github.com/SunilKividor/donela/internal/storage"
 )
 
-func Initialize() (*api.Server, error) {
+func InitializeApp() (*api.Server, error) {
 	ctx := context.Background()
 
 	cfg := config.Load()
 
-	s3Client, err := config.NewS3Client(ctx, cfg.AwsS3Config)
+	s3Client, err := config.NewS3Client(ctx, cfg)
 	if err != nil {
 		return nil, err
 	}

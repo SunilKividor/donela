@@ -5,10 +5,10 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/sqs"
 )
 
-func NewS3Client(ctx context.Context, c *Config) (*s3.Client, error) {
+func NewSQSClient(ctx context.Context, c *Config) (*sqs.Client, error) {
 
 	cfg, err := config.LoadDefaultConfig(ctx,
 		config.WithRegion(c.AwsIAMConfig.Region),
@@ -19,5 +19,5 @@ func NewS3Client(ctx context.Context, c *Config) (*s3.Client, error) {
 		return nil, err
 	}
 
-	return s3.NewFromConfig(cfg), nil
+	return sqs.NewFromConfig(cfg), nil
 }
