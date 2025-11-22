@@ -3,8 +3,9 @@ package queue
 import "context"
 
 type Message struct {
-	ID   string
-	Body []byte
+	ID            string
+	Body          []byte
+	ReceiptHandle *string
 }
 
 type Queue interface {

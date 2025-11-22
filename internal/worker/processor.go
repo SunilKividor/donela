@@ -91,5 +91,20 @@ func (p *Processor) uploadProcessed(ctx context.Context, tempDir, trackID string
 		}
 	}
 
+	masterPlaylist := p.ffmpeg.GenerateMasterPlaylist(bitrates)
+	masterPath := filepath.Join(tempDir, "master.m3u8")
+	err := os.WriteFile(masterPath, []byte(masterPlaylist), 0644)
+	if err != nil {
+		return fmt.Errorf("failed writing master playlist: %w", err)
+	}
+
+	masterKey := fmt.Sprintf("tracks/%s/master.m3u8", trackID)
+
+	err = p.uploadStorage.Upload(ctx, p.config.R2Config.Bucket, masterKey, masterPath)
+	if err != nil {
+		return fmt.Errorf("failed uploading master playlist: %w", err)
+	}
+
+	fmt.Println("[PROCESSOR] Uploaded master playlist:", masterKey)
 	return nil
 }

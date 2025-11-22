@@ -8,6 +8,7 @@ import (
 
 type FFmpegService interface {
 	GenerateAACVariants(input, outputDir string) error
+	GenerateMasterPlaylist(qualities []string) string
 }
 
 type FFmpeg struct{}
@@ -50,24 +51,30 @@ func (f FFmpeg) GenerateAACVariants(inputPath, tempDir string) error {
 	return nil
 }
 
-func GenerateMasterPlaylist(uuid string, qualities []string) string {
-	template := "#EXTM3U\n#EXT-X-VERSION:3\n\n"
+func (f FFmpeg) GenerateMasterPlaylist(qualities []string) string {
+	playlist := "#EXTM3U\n#EXT-X-VERSION:3\n\n"
 
 	for _, q := range qualities {
+		var bw int
+		var avg int
+
 		switch q {
 		case "aac_64k":
-			template += "#EXT-X-STREAM-INF:BANDWIDTH=64000,CODECS=\"mp4a.40.2\"\n"
+			bw = 80000
+			avg = 65000
 		case "aac_128k":
-			template += "#EXT-X-STREAM-INF:BANDWIDTH=128000,CODECS=\"mp4a.40.2\"\n"
+			bw = 140000
+			avg = 130000
 		case "aac_256k":
-			template += "#EXT-X-STREAM-INF:BANDWIDTH=256000,CODECS=\"mp4a.40.2\"\n"
-		case "opus_96k":
-			template += "#EXT-X-STREAM-INF:BANDWIDTH=96000,CODECS=\"opus\"\n"
-		case "opus_160k":
-			template += "#EXT-X-STREAM-INF:BANDWIDTH=160000,CODECS=\"opus\"\n"
+			bw = 280000
+			avg = 260000
 		}
-		template += fmt.Sprintf("%s/playlist.m3u8\n\n", q)
+
+		playlist += fmt.Sprintf(
+			"#EXT-X-STREAM-INF:BANDWIDTH=%d,AVERAGE-BANDWIDTH=%d,CODECS=\"mp4a.40.2\"\n%s/playlist.m3u8\n\n",
+			bw, avg, q,
+		)
 	}
 
-	return template
+	return playlist
 }

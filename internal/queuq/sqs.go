@@ -41,15 +41,16 @@ func (q *SQSQueue) Receive(ctx context.Context) (*Message, error) {
 	msg := resp.Messages[0]
 
 	return &Message{
-		ID:   *msg.MessageId,
-		Body: []byte(*msg.Body),
+		ID:            *msg.MessageId,
+		Body:          []byte(*msg.Body),
+		ReceiptHandle: msg.ReceiptHandle,
 	}, nil
 }
 
 func (q *SQSQueue) Delete(ctx context.Context, msg *Message) error {
 	_, err := q.client.DeleteMessage(ctx, &sqs.DeleteMessageInput{
 		QueueUrl:      &q.queueURL,
-		ReceiptHandle: &msg.ID,
+		ReceiptHandle: msg.ReceiptHandle,
 	})
 
 	return err
