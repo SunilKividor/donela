@@ -5,23 +5,24 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 )
 
-type S3Storage struct {
+type R2Storage struct {
 	client *s3.Client
 }
 
-func NewS3StorageClient(client *s3.Client) *S3Storage {
-	return &S3Storage{
+func NewR2StorageClient(client *s3.Client) *R2Storage {
+	return &R2Storage{
 		client: client,
 	}
 }
 
-func (c *S3Storage) UploadURL(ctx context.Context, bucket, key string, expiry time.Duration) (string, error) {
+func (c *R2Storage) UploadURL(ctx context.Context, bucket, key string, expiry time.Duration) (string, error) {
 	presignClient := s3.NewPresignClient(c.client)
 
 	presignReq, err := presignClient.PresignPutObject(
@@ -39,7 +40,7 @@ func (c *S3Storage) UploadURL(ctx context.Context, bucket, key string, expiry ti
 	return presignReq.URL, nil
 }
 
-func (c *S3Storage) DownloadURL(ctx context.Context, bucket, key string, expiry time.Duration) (string, error) {
+func (c *R2Storage) DownloadURL(ctx context.Context, bucket, key string, expiry time.Duration) (string, error) {
 	presignClient := s3.NewPresignClient(c.client)
 
 	presignReq, err := presignClient.PresignGetObject(
@@ -56,27 +57,39 @@ func (c *S3Storage) DownloadURL(ctx context.Context, bucket, key string, expiry 
 	return presignReq.URL, nil
 }
 
-func (c *S3Storage) Upload(ctx context.Context, bucket, key, fullPath string) error {
-	return errors.New("direct upload not supported for S3; use signed URLs")
-}
+func (c *R2Storage) Upload(ctx context.Context, bucket, key, fullPath string) error {
+	fmt.Println("[R2] Uploading:", fullPath, "→", key)
 
-func (c *S3Storage) Download(ctx context.Context, bucket, key string) (io.ReadCloser, error) {
-	out, err := c.client.GetObject(ctx, &s3.GetObjectInput{
+	file, err := os.Open(fullPath)
+	if err != nil {
+		return fmt.Errorf("failed to open file for upload: %w", err)
+	}
+	defer file.Close()
+
+	_, err = c.client.PutObject(ctx, &s3.PutObjectInput{
 		Bucket: &bucket,
 		Key:    &key,
+		Body:   file,
 	})
+
 	if err != nil {
-		return nil, fmt.Errorf("error getting object from S3")
+		return fmt.Errorf("failed to upload file to R2: %w", err)
 	}
 
-	return out.Body, nil
-}
+	fmt.Println("[R2] Uploaded:", key)
 
-func (c *S3Storage) Delete(ctx context.Context, bucket, key string) error {
 	return nil
 }
 
-func (c *S3Storage) Exists(ctx context.Context, bucket, key string) (bool, error) {
+func (c *R2Storage) Download(ctx context.Context, bucket, key string) (io.ReadCloser, error) {
+	return nil, errors.New("direct download not supported for S3; use signed URLs")
+}
+
+func (c *R2Storage) Delete(ctx context.Context, bucket, key string) error {
+	return nil
+}
+
+func (c *R2Storage) Exists(ctx context.Context, bucket, key string) (bool, error) {
 	if key == "" {
 		return false, errors.New("key is required")
 	}

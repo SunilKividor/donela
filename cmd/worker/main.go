@@ -13,11 +13,10 @@ func main() {
 		fmt.Println("[INFO] Loaded .env from project root")
 	}
 
-	worker, err := di.InitializeWorker()
+	w, err := di.InitializeWorker()
 	if err != nil {
 		panic(err)
 	}
 
-	worker.Start(context.Background())
-
+	w.Start(context.Background())
 }

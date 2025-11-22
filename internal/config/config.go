@@ -7,6 +7,7 @@ type Config struct {
 	AwsS3Config  *AWSS3Config
 	AwsSQSConfig *AWSSQSConfig
 	AwsIAMConfig *AWSIAMConfig
+	R2Config     *R2Config
 }
 
 type ServerConfig struct {
@@ -21,6 +22,14 @@ type AWSIAMConfig struct {
 
 type AWSS3Config struct {
 	Bucket string
+}
+
+type R2Config struct {
+	AccountId    string
+	AccessKey    string
+	AccessSecret string
+	Bucket       string
+	Region       string
 }
 
 type AWSSQSConfig struct {
@@ -42,6 +51,13 @@ func Load() *Config {
 			AccessKey:    os.Getenv("S3AccessKey"),
 			AccessSecret: os.Getenv("S3AccessSecret"),
 			Region:       os.Getenv("S3Region"),
+		},
+		R2Config: &R2Config{
+			AccountId:    os.Getenv("R2AccountId"),
+			AccessKey:    os.Getenv("R2AccessKey"),
+			AccessSecret: os.Getenv("R2AccessSecret"),
+			Bucket:       os.Getenv("R2Bucket"),
+			Region:       os.Getenv("R2Region"),
 		},
 	}
 }

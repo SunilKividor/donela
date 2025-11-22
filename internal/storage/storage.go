@@ -12,7 +12,7 @@ type StorageService interface {
 	DownloadURL(ctx context.Context, bucket, key string, expiry time.Duration) (string, error)
 
 	//local processing
-	Upload(ctx context.Context, bucket, key string, data io.Reader) error
+	Upload(ctx context.Context, bucket, key, fullPath string) error
 	Download(ctx context.Context, buket, key string) (io.ReadCloser, error)
 	Delete(ctx context.Context, bucket, key string) error
 
