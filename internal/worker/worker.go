@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	queue "github.com/SunilKividor/donela/internal/queuq"
+	queue "github.com/SunilKividor/donela/internal/queue"
 	"github.com/google/uuid"
 )
 

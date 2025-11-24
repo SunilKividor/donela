@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/SunilKividor/donela/internal/config"
-	queue "github.com/SunilKividor/donela/internal/queuq"
+	queue "github.com/SunilKividor/donela/internal/queue"
 	"github.com/SunilKividor/donela/internal/storage"
 	"github.com/SunilKividor/donela/internal/worker"
 )
