@@ -3,11 +3,14 @@ package config
 import "os"
 
 type Config struct {
-	ServerConfig *ServerConfig
-	AwsS3Config  *AWSS3Config
-	AwsSQSConfig *AWSSQSConfig
-	AwsIAMConfig *AWSIAMConfig
-	R2Config     *R2Config
+	ServerConfig   *ServerConfig
+	AwsS3Config    *AWSS3Config
+	AwsSQSConfig   *AWSSQSConfig
+	AwsIAMConfig   *AWSIAMConfig
+	R2Config       *R2Config
+	PostgresConfig *PostgresConfig
+	RedisConfig    *RedisConfig
+	JWTConfig      *JWTConfig
 }
 
 type ServerConfig struct {
@@ -36,6 +39,18 @@ type AWSSQSConfig struct {
 	QueueURL string
 }
 
+type PostgresConfig struct {
+	ConnectionString string
+}
+
+type RedisConfig struct {
+	ConnectionString string
+}
+
+type JWTConfig struct {
+	Secret string
+}
+
 func Load() *Config {
 	return &Config{
 		ServerConfig: &ServerConfig{
@@ -58,6 +73,15 @@ func Load() *Config {
 			AccessSecret: os.Getenv("R2AccessSecret"),
 			Bucket:       os.Getenv("R2Bucket"),
 			Region:       os.Getenv("R2Region"),
+		},
+		PostgresConfig: &PostgresConfig{
+			ConnectionString: os.Getenv("Postgres_URI"),
+		},
+		RedisConfig: &RedisConfig{
+			ConnectionString: os.Getenv("Redis_URI"),
+		},
+		JWTConfig: &JWTConfig{
+			Secret: os.Getenv("JWTAPISECRET"),
 		},
 	}
 }

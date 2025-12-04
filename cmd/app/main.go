@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	if err := godotenv.Load("../../.env"); err == nil {
+	if err := godotenv.Load(".env"); err == nil {
 		fmt.Println("[INFO] Loaded .env from project root")
 	}
 

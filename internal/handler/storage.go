@@ -29,7 +29,7 @@ func (sh *StorageHandler) UploadURL(c *gin.Context) {
 
 	bucket := sh.Config.AwsS3Config.Bucket
 	prefix := "raw"
-	userId := uuid.New().String() //get this from the gin context - user id
+	userId := uuid.New().String()
 	contentExt := ".flac"
 
 	key := util.GenerateNewAWSObjectKey(prefix, userId, contentExt)
