@@ -96,18 +96,18 @@ func (a *JWTAuthClient) Login(ctx context.Context, username, password string) (*
 
 func (a *JWTAuthClient) Refresh(ctx context.Context, refreshToken string) (*auth.AuthTokens, error) {
 
-	parsed, err := jwt.Parse(refreshToken, func(t *jwt.Token) (interface{}, error) {
+	parsedToken, err := jwt.Parse(refreshToken, func(t *jwt.Token) (interface{}, error) {
 		if t.Method != jwt.SigningMethodHS256 {
 			return nil, fmt.Errorf("unexpected signing method: %v", t.Method.Alg())
 		}
 		return a.privateKey, nil
 	})
 
-	if err != nil || !parsed.Valid {
+	if err != nil || !parsedToken.Valid {
 		return nil, fmt.Errorf("invalid refresh token")
 	}
 
-	claims, ok := parsed.Claims.(jwt.MapClaims)
+	claims, ok := parsedToken.Claims.(jwt.MapClaims)
 	if !ok {
 		return nil, fmt.Errorf("invalid token claims")
 	}
@@ -122,6 +122,11 @@ func (a *JWTAuthClient) Refresh(ctx context.Context, refreshToken string) (*auth
 		return nil, fmt.Errorf("refresh token expired")
 	}
 
+	storedRefreshToken, err := a.authRepo.GetRefreshToken(ctx, userId)
+	if err != nil || refreshToken != storedRefreshToken {
+		return nil, fmt.Errorf("invalid refresh token")
+	}
+
 	accessToken, err := a.generateAccessToken(userId)
 	if err != nil {
 		return nil, err
@@ -129,7 +134,7 @@ func (a *JWTAuthClient) Refresh(ctx context.Context, refreshToken string) (*auth
 
 	return &auth.AuthTokens{
 		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
+		RefreshToken: storedRefreshToken,
 	}, nil
 }
 

@@ -15,6 +15,7 @@ func RegisterRoutes(r *gin.Engine, cfg *config.Config, handlers *handler.Handler
 		//auth
 		v1.POST("/signup", handlers.Authentication.SignUp)
 		v1.POST("/login", handlers.Authentication.Login)
+		v1.POST("/refresh", handlers.Authentication.Refresh)
 
 		v1.GET("/upload/signed", handlers.Storage.UploadURL)
 		v1.GET("/download/signed", handlers.Storage.DownloadURL)

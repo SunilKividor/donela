@@ -29,6 +29,10 @@ type AuthSignUpReq struct {
 	Role     string `json:"role"`
 }
 
+type AuthRefreshReq struct {
+	RefreshToken string `json:"refresh_token"`
+}
+
 func (ah *AuthenticationHandler) Login(c *gin.Context) {
 	var reqB AuthLoginReq
 
@@ -59,6 +63,25 @@ func (ah *AuthenticationHandler) SignUp(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	authTokens, err := ah.Authentication.SignUp(ctx, reqB.Name, reqB.Username, reqB.Password, reqB.Role)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, authTokens)
+}
+
+func (ah *AuthenticationHandler) Refresh(c *gin.Context) {
+	var reqB AuthRefreshReq
+
+	if c.ShouldBindJSON(&reqB) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "bad request format"})
+		return
+	}
+
+	ctx := c.Request.Context()
+
+	authTokens, err := ah.Authentication.Refresh(ctx, reqB.RefreshToken)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
