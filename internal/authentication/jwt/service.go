@@ -142,7 +142,17 @@ func (a *JWTAuthClient) ValidateAccessToken(ctx context.Context, token string) (
 	return nil, nil
 }
 
-func (a *JWTAuthClient) Logout(ctx context.Context, refreshToken string) error {
+func (a *JWTAuthClient) Logout(ctx context.Context, id string) error {
+
+	if id == "" {
+		return fmt.Errorf("empty refresh token")
+	}
+
+	err := a.authRepo.DeleteRefreshToken(ctx, id)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

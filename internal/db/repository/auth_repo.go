@@ -93,7 +93,12 @@ func (a *AuthRepository) DeleteRefreshToken(ctx context.Context, id string) erro
 
 	key := refreshKey(id)
 
-	_, err := redisClient.Del(ctx, key).Result()
+	res, err := redisClient.Del(ctx, key).Result()
+
+	if res == 0 {
+		return fmt.Errorf("refresh token does not exist or already deleted")
+	}
+
 	if err != nil {
 		return fmt.Errorf("failed to delete refresh token: %w", err)
 	}

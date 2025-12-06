@@ -1,4 +1,4 @@
-package jwt
+package middleware
 
 import (
 	"fmt"
@@ -9,17 +9,15 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/google/uuid"
 )
 
-func AuthMiddleware() gin.HandlerFunc {
+func JWTMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		err := tokenValid(c)
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"error": err.Error(),
 			})
-			c.Abort()
 			return
 		}
 		c.Next()
@@ -27,7 +25,7 @@ func AuthMiddleware() gin.HandlerFunc {
 }
 
 func tokenValid(c *gin.Context) error {
-	token := ExtractToken(c)
+	token := extractToken(c)
 
 	parsedToken, err := parseToken(token)
 	if err != nil {
@@ -46,10 +44,14 @@ func tokenValid(c *gin.Context) error {
 	if time.Now().After(expTime) {
 		return fmt.Errorf("token is expired")
 	}
+
+	id := claims["sub"].(string)
+	c.Set("id", id)
+
 	return nil
 }
 
-func ExtractToken(c *gin.Context) string {
+func extractToken(c *gin.Context) string {
 	bearerToken := c.Request.Header.Get("Authorization")
 	if len(strings.Split(bearerToken, " ")) == 2 {
 		return strings.Split(bearerToken, " ")[1]
@@ -62,7 +64,7 @@ func parseToken(token string) (*jwt.Token, error) {
 		if t.Method != jwt.SigningMethodHS256 {
 			return nil, fmt.Errorf("unexpected signing method: %v", t.Method.Alg())
 		}
-		return []byte(os.Getenv("APISECRET")), nil
+		return []byte(os.Getenv("JWTAPISECRET")), nil
 	})
 
 	if err != nil {
@@ -72,29 +74,29 @@ func parseToken(token string) (*jwt.Token, error) {
 	return parsedToken, nil
 }
 
-func ExtractIdFromContext(c *gin.Context) (uuid.UUID, error) {
-	token := ExtractToken(c)
-	return ExtractIdFromToken(token)
-}
+// func ExtractIdFromContext(c *gin.Context) (uuid.UUID, error) {
+// 	token := extractToken(c)
+// 	return ExtractIdFromToken(token)
+// }
 
-func ExtractIdFromToken(token string) (uuid.UUID, error) {
-	var id uuid.UUID
-	parsedToken, err := parseToken(token)
-	if err != nil {
-		return id, err
-	}
+// func ExtractIdFromToken(token string) (uuid.UUID, error) {
+// 	var id uuid.UUID
+// 	parsedToken, err := parseToken(token)
+// 	if err != nil {
+// 		return id, err
+// 	}
 
-	claims, ok := parsedToken.Claims.(jwt.MapClaims)
-	if !ok || !parsedToken.Valid {
-		return id, fmt.Errorf("invalid token claims")
-	}
-	idStr, ok := claims["id"].(string)
-	if !ok {
-		return id, fmt.Errorf("id is null or not string")
-	}
-	id, err = uuid.Parse(idStr)
-	if err != nil {
-		return id, err
-	}
-	return id, nil
-}
+// 	claims, ok := parsedToken.Claims.(jwt.MapClaims)
+// 	if !ok || !parsedToken.Valid {
+// 		return id, fmt.Errorf("invalid token claims")
+// 	}
+// 	idStr, ok := claims["id"].(string)
+// 	if !ok {
+// 		return id, fmt.Errorf("id is null or not string")
+// 	}
+// 	id, err = uuid.Parse(idStr)
+// 	if err != nil {
+// 		return id, err
+// 	}
+// 	return id, nil
+// }

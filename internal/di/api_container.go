@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/SunilKividor/donela/internal/api"
+	"github.com/SunilKividor/donela/internal/authentication/http/middleware"
 	"github.com/SunilKividor/donela/internal/authentication/jwt"
 	"github.com/SunilKividor/donela/internal/config"
 	pg "github.com/SunilKividor/donela/internal/db/pg"
@@ -50,7 +51,9 @@ func InitializeApp() (*api.Server, error) {
 
 	server := api.NewServer(cfg)
 
-	api.RegisterRoutes(server.Engine, cfg, handlers)
+	middleware := middleware.JWTMiddleware()
+
+	api.RegisterRoutes(server.Engine, cfg, handlers, middleware)
 
 	return server, nil
 }

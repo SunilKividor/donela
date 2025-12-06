@@ -89,3 +89,20 @@ func (ah *AuthenticationHandler) Refresh(c *gin.Context) {
 
 	c.JSON(http.StatusOK, authTokens)
 }
+
+func (ah *AuthenticationHandler) Logout(c *gin.Context) {
+
+	id := c.GetString("id")
+
+	ctx := c.Request.Context()
+
+	err := ah.Authentication.Logout(ctx, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "success",
+	})
+}
