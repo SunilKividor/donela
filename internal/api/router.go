@@ -22,8 +22,7 @@ func RegisterRoutes(r *gin.Engine, cfg *config.Config, handlers *handler.Handler
 	authRequired := v1.Group("/")
 	authRequired.Use(middleware)
 	{
+		authRequired.POST("/songs", handlers.SongHandler.CreateSongWithAlbum)
 		authRequired.POST("/logout", handlers.Authentication.Logout)
-		authRequired.GET("/upload/signed", handlers.Storage.UploadURL)
-		authRequired.GET("/download/signed", handlers.Storage.DownloadURL)
 	}
 }

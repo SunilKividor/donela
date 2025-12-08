@@ -11,6 +11,7 @@ import (
 	redisdb "github.com/SunilKividor/donela/internal/db/redis"
 	"github.com/SunilKividor/donela/internal/db/repository"
 	"github.com/SunilKividor/donela/internal/handler"
+	"github.com/SunilKividor/donela/internal/service"
 	"github.com/SunilKividor/donela/internal/storage"
 )
 
@@ -43,10 +44,15 @@ func InitializeApp() (*api.Server, error) {
 
 	userRepo := repository.NewUserRepository(pool)
 
+	songRepo := repository.NewSongRepository()
+	albumRepo := repository.NewAlbumRepository()
+	songService := service.NewSongService(cfg, pool, *songRepo, *albumRepo, s3Storage)
+
 	handlers := &handler.Handlers{
 		Authentication: handler.NewAuthenticationHandler(jwtAuth),
 		Storage:        handler.NewStorageHandler(cfg, s3Storage),
 		User:           handler.NewUserHandler(userRepo),
+		SongHandler:    handler.NewSongHandler(songService),
 	}
 
 	server := api.NewServer(cfg)

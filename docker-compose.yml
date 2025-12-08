@@ -59,15 +59,15 @@ services:
     ports:
       - "3000:3000"
 
-  worker:
-    build:
-      context: .
-      dockerfile: Dockerfile.worker
-    container_name: donela-worker
-    restart: always
-    depends_on:
-      migrate:
-        condition: service_completed_successfully
+  # worker:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.worker
+  #   container_name: donela-worker
+  #   restart: always
+  #   depends_on:
+  #     migrate:
+  #       condition: service_completed_successfully
 
 volumes:
   pgdata:

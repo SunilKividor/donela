@@ -7,9 +7,7 @@ import (
 
 	"github.com/SunilKividor/donela/internal/config"
 	"github.com/SunilKividor/donela/internal/storage"
-	"github.com/SunilKividor/donela/internal/util"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 type StorageHandler struct {
@@ -25,22 +23,22 @@ func NewStorageHandler(cfg *config.Config, store storage.StorageService) *Storag
 }
 
 func (sh *StorageHandler) UploadURL(c *gin.Context) {
-	ctx := context.Background()
+	// ctx := context.Background()
 
-	bucket := sh.Config.AwsS3Config.Bucket
-	prefix := "raw"
-	userId := uuid.New().String()
-	contentExt := ".flac"
+	// bucket := sh.Config.AwsS3Config.Bucket
+	// prefix := "raw"
+	// userId := uuid.New().String()
+	// contentExt := ".flac"
 
-	key := util.GenerateNewAWSObjectKey(prefix, userId, contentExt)
+	// key := util.GenerateNewAWSObjectKey(prefix, userId, contentExt)
 
-	url, err := sh.Storage.UploadURL(ctx, bucket, key, 5*time.Minute)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+	// url, err := sh.Storage.UploadURL(ctx, bucket, key, 5*time.Minute)
+	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	// 	return
+	// }
 
-	c.JSON(http.StatusOK, gin.H{"url": url})
+	// c.JSON(http.StatusOK, gin.H{"url": url})
 }
 
 func (sh *StorageHandler) DownloadURL(c *gin.Context) {

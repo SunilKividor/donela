@@ -2,14 +2,17 @@ package util
 
 import (
 	"fmt"
-
-	"github.com/google/uuid"
 )
 
-func GenerateNewAWSObjectKey(prefix string, userId string, contentExt string) string {
-	key := uuid.New().String()
+func GenerateRawUploadKey(songID string, artistID string, fileExtension string) string {
 
-	awsS3BucketKey := fmt.Sprintf("%s/%s/%s%s", prefix, userId, key, contentExt)
+	prefix := "raw/"
 
-	return awsS3BucketKey
+	key := fmt.Sprintf("%s%s/%s%s",
+		prefix,
+		artistID,
+		songID,
+		fileExtension)
+
+	return key
 }

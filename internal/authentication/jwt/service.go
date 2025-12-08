@@ -7,6 +7,7 @@ import (
 
 	"github.com/SunilKividor/donela/internal/authentication/auth"
 	"github.com/SunilKividor/donela/internal/db/repository"
+	"github.com/SunilKividor/donela/internal/models"
 	"github.com/golang-jwt/jwt"
 )
 
@@ -25,7 +26,7 @@ func NewJWTAuthenticationClient(authRepo *repository.AuthRepository, jwtSecret s
 	}
 }
 
-func (a *JWTAuthClient) SignUp(ctx context.Context, name, username, password, role string) (*auth.AuthTokens, error) {
+func (a *JWTAuthClient) SignUp(ctx context.Context, name, username, password, role string) (*models.AuthTokens, error) {
 
 	passwordHash, err := auth.HashPassword(password)
 	if err != nil {
@@ -52,7 +53,7 @@ func (a *JWTAuthClient) SignUp(ctx context.Context, name, username, password, ro
 		return nil, err
 	}
 
-	authTokens := &auth.AuthTokens{
+	authTokens := &models.AuthTokens{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}
@@ -60,7 +61,7 @@ func (a *JWTAuthClient) SignUp(ctx context.Context, name, username, password, ro
 	return authTokens, nil
 }
 
-func (a *JWTAuthClient) Login(ctx context.Context, username, password string) (*auth.AuthTokens, error) {
+func (a *JWTAuthClient) Login(ctx context.Context, username, password string) (*models.AuthTokens, error) {
 
 	user, err := a.authRepo.GetUserByEmail(ctx, username)
 	if err != nil {
@@ -86,7 +87,7 @@ func (a *JWTAuthClient) Login(ctx context.Context, username, password string) (*
 		return nil, err
 	}
 
-	authTokens := &auth.AuthTokens{
+	authTokens := &models.AuthTokens{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}
@@ -94,7 +95,7 @@ func (a *JWTAuthClient) Login(ctx context.Context, username, password string) (*
 	return authTokens, nil
 }
 
-func (a *JWTAuthClient) Refresh(ctx context.Context, refreshToken string) (*auth.AuthTokens, error) {
+func (a *JWTAuthClient) Refresh(ctx context.Context, refreshToken string) (*models.AuthTokens, error) {
 
 	parsedToken, err := jwt.Parse(refreshToken, func(t *jwt.Token) (interface{}, error) {
 		if t.Method != jwt.SigningMethodHS256 {
@@ -132,13 +133,13 @@ func (a *JWTAuthClient) Refresh(ctx context.Context, refreshToken string) (*auth
 		return nil, err
 	}
 
-	return &auth.AuthTokens{
+	return &models.AuthTokens{
 		AccessToken:  accessToken,
 		RefreshToken: storedRefreshToken,
 	}, nil
 }
 
-func (a *JWTAuthClient) ValidateAccessToken(ctx context.Context, token string) (*auth.AuthUser, error) {
+func (a *JWTAuthClient) ValidateAccessToken(ctx context.Context, token string) (*models.AuthUser, error) {
 	return nil, nil
 }
 

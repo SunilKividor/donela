@@ -2,7 +2,7 @@
 # VARIABLES
 # ============
 DB_URL=postgres://sunil:password123@localhost:5432/donela?sslmode=disable
-MIGRATIONS_DIR=internal/db/migrations
+MIGRATIONS_DIR=internal/db/pg/migrations
 
 # Docker compose override
 DC=docker compose

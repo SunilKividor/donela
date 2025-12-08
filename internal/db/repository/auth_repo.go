@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/SunilKividor/donela/internal/authentication/auth"
+	"github.com/SunilKividor/donela/internal/models"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
@@ -27,13 +27,13 @@ func refreshKey(id string) string {
 	return fmt.Sprintf("refresh:%s", id)
 }
 
-func (a *AuthRepository) GetUserByEmail(ctx context.Context, username string) (*auth.AuthUser, error) {
+func (a *AuthRepository) GetUserByEmail(ctx context.Context, username string) (*models.AuthUser, error) {
 
 	db := a.db
 
 	smt := `SELECT id,username,password_hash,role FROM users WHERE username = $1`
 
-	var authUser auth.AuthUser
+	var authUser models.AuthUser
 	row := db.QueryRow(ctx, smt, username)
 	err := row.Scan(&authUser.Id, &authUser.Username, &authUser.PasswordHash, &authUser.Role)
 	if err != nil {
